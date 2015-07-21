@@ -1,0 +1,50 @@
+- hosts: all
+  sudo: yes
+  tasks:
+      - name: Ensure dependencies are installed.
+        apt: pkg=curl state=installed
+
+      - name: install python-pycurl
+        apt: pkg=python-pycurl state=latest
+
+      - name: Add Jenkins apt repository key.
+        apt_key:
+          url: "https://jenkins-ci.org/debian/jenkins-ci.org.key"
+          state: present
+          validate_certs: no
+
+      - name: Add Jenkins apt repository.
+        apt_repository:
+          repo: "deb http://pkg.jenkins-ci.org/debian binary/"
+          state: present
+          update_cache: yes
+
+      - name: Ensure Jenkins is installed.
+        apt: pkg=jenkins state=installed
+
+      - name: Ensure Jenkins-cli is installed.
+        apt: pkg=jenkins-cli state=installed
+
+      - name: Ensure Jenkins is running
+        service: name=jenkins state=started
+
+      - name: Wait for Jenkins to start
+        wait_for:
+          host=localhost
+          port=8080
+          delay=10
+          timeout=300
+
+      - name: Check if job path exists
+        stat: path=/var/lib/jenkins/jobs/build-lighttpd
+        register: check_job_path
+
+      - name: Create a job with Jenkins-cli using an existing jobs xml
+        shell: 'jenkins-cli -s http://localhost:8080 create-job build-lighttpd < /vagrant/jobs/build-lighttpd.xml'
+        when: check_job_path.stat.exists == false
+
+      - name: Install the Swarm plugin
+        get_url: dest=/var/lib/jenkins/plugins url=https://updates.jenkins-ci.org/download/plugins/swarm/1.22/swarm.hpi validate_certs=no
+
+      - name: Restart Jenkins to activate the Swarm plugin
+        service: name=jenkins state=restarted
