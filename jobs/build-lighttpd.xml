@@ -14,13 +14,19 @@
   <customWorkspace>/tmp</customWorkspace>
   <builders>
     <hudson.tasks.BatchFile>
-      <command>svn checkout svn://svn.lighttpd.net/lighttpd/branches/lighttpd-1.4.x/
-cd lighttpd-1.4.x
+      <command>wget http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.35.tar.gz
+tar -xzvf lighttpd-1.4.35.tar.gz
+cd lighttpd-1.4.35
 ./autogen.sh
 
-if not errorlevel 0 (
-    echo error level was nonzero
-)</command>
+if [ $? -eq 0 ]
+then
+  echo &quot;Build Successful &quot;
+  exit 0
+else
+  echo &quot;Build Failed&quot; &gt;&amp;2
+  exit 1
+fi</command>
     </hudson.tasks.BatchFile>
   </builders>
   <publishers/>
