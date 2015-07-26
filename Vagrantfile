@@ -16,10 +16,17 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       master.vm.box_url = "http://files.vagrantup.com/precise32.box"
       master.vm.hostname = "master"
       master.vm.network :forwarded_port, guest: 8080, host: 1234
-      master.vm.network "private_network", ip: "192.168.50.1"
-      master.vm.provision "ansible" do |ansible|
-          ansible.playbook = "master.yml"
-      end
+      master.vm.network "private_network", ip: "192.168.50.5"
+      #master.vm.provision "ansible" do |ansible|
+      #    ansible.playbook = "master.yml"
+      #end
+	  master.vm.provision "shell", inline: <<-SHELL
+      apt-get -y update
+      apt-get -y install python-dev python-pip
+      pip install ansible
+      mkdir -p /etc/ansible && echo localhost > /etc/ansible/hosts
+      ansible-playbook -c local /vagrant/master.yml
+      SHELL
   end
 
 end
