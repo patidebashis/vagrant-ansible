@@ -3,38 +3,40 @@
   tasks:
       - name: Ensure dependencies are installed.
         apt: pkg=curl state=installed
-
       - name: install python-pycurl
         apt: pkg=python-pycurl state=latest
-
+      - name: Add Java repository to sources
+        action: apt_repository repo='ppa:webupd8team/java'
+      - name: Autoaccept license for Java
+        action: shell echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+      - name: Autoaccept license for Java
+        action: shell echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
+      - name: Install Java 7
+        action: apt pkg=oracle-java7-installer state=latest install_recommends=yes  
+      - name: Set Java 7 Env
+        action: apt pkg=oracle-java7-set-default state=latest install_recommends=yes
       - name: Add Jenkins apt repository key.
         apt_key:
           url: "https://jenkins-ci.org/debian/jenkins-ci.org.key"
           state: present
           validate_certs: no
-
       - name: Add Jenkins apt repository.
         apt_repository:
           repo: "deb http://pkg.jenkins-ci.org/debian binary/"
           state: present
           update_cache: yes
-
       - name: Ensure Jenkins is installed.
         apt: pkg=jenkins state=installed
-
       - name: Ensure Jenkins-cli is installed.
         apt: pkg=jenkins-cli state=installed
-
       - name: Ensure Jenkins is running
         service: name=jenkins state=started
-
       - name: Wait for Jenkins to start
         wait_for:
           host=localhost
           port=8080
           delay=10
           timeout=300
-
       - name: Check if job path exists
         stat: path=/var/lib/jenkins/jobs/build-lighttpd
         register: check_job_path
