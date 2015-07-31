@@ -13,7 +13,7 @@
   <concurrentBuild>false</concurrentBuild>
   <customWorkspace>/tmp</customWorkspace>
   <builders>
-    <hudson.tasks.BatchFile>
+    <hudson.tasks.Shell>
       <command>wget http://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.35.tar.gz
 tar -xzvf lighttpd-1.4.35.tar.gz
 cd lighttpd-1.4.35
@@ -27,7 +27,7 @@ else
   echo &quot;Build Failed&quot; &gt;&amp;2
   exit 1
 fi</command>
-    </hudson.tasks.BatchFile>
+    </hudson.tasks.Shell>
   </builders>
   <publishers/>
   <buildWrappers/>
